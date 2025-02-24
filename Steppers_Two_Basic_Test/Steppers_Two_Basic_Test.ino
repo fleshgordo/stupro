@@ -6,7 +6,7 @@
 
    In this demo driver chip is in slot X (pin 5, 2)
 
-   Adapted 2021/2022 by Gordan Savicic
+   Adapted 2022/2023 by Gordan Savicic
    based on Copyright (C)2015-2017 Laurentiu Badea
 
    This file may be redistributed under the terms of the MIT license.
@@ -23,7 +23,7 @@
 // Since microstepping is set externally, make sure this matches the selected mode
 // Set the jumper to middle position when using MICROSTEPS 4, no jumper = MICROSTEPS 1
 // 1=full step, 2=half step etc.
-#define MICROSTEPS 1
+#define MICROSTEPS 4
 
 // Driver in CNC shield X
 #define DIR_X 5
@@ -41,34 +41,35 @@
 #define SLEEP 8
 
 // Initialize the driver(s)
-BasicStepperDriver stepper(MOTOR_STEPS, DIR_Y, STEP_Y, SLEEP);
-BasicStepperDriver stepper2(MOTOR_STEPS, DIR_X, STEP_X, SLEEP);
+BasicStepperDriver stepperX(MOTOR_STEPS, DIR_Y, STEP_Y, SLEEP);
+BasicStepperDriver stepperY(MOTOR_STEPS, DIR_X, STEP_X, SLEEP);
 
 void setup() {
   // Pass some config to the instances and begin
-  stepper.begin(RPM, MICROSTEPS);
+  stepperX.begin(RPM, MICROSTEPS);
+  //stepperX.setSpeedProfile(stepper.LINEAR_SPEED);
+  
+  // if using enable/disable on ENABLE pin (active LOW) instead of SLEEP uncomment next line
+  stepperX.setEnableActiveState(LOW);
+
+  stepperY.begin(RPM, MICROSTEPS);
 
   // if using enable/disable on ENABLE pin (active LOW) instead of SLEEP uncomment next line
-  stepper.setEnableActiveState(LOW);
-
-  stepper2.begin(RPM, MICROSTEPS);
-
-  // if using enable/disable on ENABLE pin (active LOW) instead of SLEEP uncomment next line
-  stepper2.setEnableActiveState(LOW);
+  stepperY.setEnableActiveState(LOW);
 }
 
 void loop() {
   // energize coils
-  stepper.enable();
-  stepper2.enable();
+  stepperX.enable();
+  stepperY.enable();
 
   // Moving motor one full revolution using the degree notation
-  stepper.rotate(360);
-  stepper2.rotate(360);
+  stepperX.rotate(360);
+  stepperY.rotate(360);
 
   // pause and allow the motor to be moved by hand
-  stepper.disable();
-  stepper2.disable();
+  stepperX.disable();
+  stepperY.disable();
 
   delay(2000);  // repeat after 2sec. pause
 }
